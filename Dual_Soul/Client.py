@@ -3,7 +3,7 @@ import threading
 from pynput import keyboard,mouse
 import time
 import sys
-
+import Input_Modification as IM
 
 class Client():
     def __init__(self):
@@ -24,6 +24,9 @@ class Client():
         self.client_ip = socket.gethostbyname(socket.gethostname())
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.addr = ("127.0.1.1",self.port)
+        self.preferences = open("Preferences.txt")
+        self.translation_table = IM.extract_Translation_Table(self.preferences.read())
+        print(self.translation_table)
 
 
     def send(self,msg):
@@ -45,9 +48,13 @@ class Client():
     def on_press_key(self,key):
         ### Will send a message only if the Allower state is true
         self.key_state = self.allower_checker(key)
+        print(self.translation_table[str(key)])
         if self.key_state or self.locked_key_state:
             try:
-                self.send(str("{0} {1} {2} {3} {4}".format("K","P",key,None,None)))
+                if key in self.translation_table:
+                    self.send(str("{0} {1} {2} {3} {4}".format("K","P",self.translation_table[key],None,None)))
+                else:
+                    self.send(str("{0} {1} {2} {3} {4}".format("K","P",key,None,None)))
             except AttributeError:
                 print('special key {0} pressed'.format(key))
 
@@ -55,7 +62,12 @@ class Client():
         #self.allower_checker(key)
         if self.key_state:
             try :
-                self.send(str("{0} {1} {2} {3} {4}".format("K","R",key,None,None)))
+                if key in self.translation_table:
+                    self.send(str("{0} {1} {2} {3} {4}".format("K","R",self.translation_table[key],None,None)))
+                else:
+                    self.send(str("{0} {1} {2} {3} {4}".format("K","R",key,None,None)))
+                
+                
                 if key == keyboard.Key.esc:
                     #send("!!disconnect")
                     #return False
