@@ -15,9 +15,10 @@ class server():
         self.header = 128
         self.port = 5050
         self.disconnect_msg = "!!disconnect"
+        self.specialkey_dic = {"Key.enter":Key.enter}
 
         #Setting up and initiating the Server
-        self.server_ip = socket.gethostbyname(socket.gethostname())
+        self.server_ip = "127.0.0.1" #socket.gethostbyname(socket.gethostname())
         self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.addr = (self.server_ip,self.port)
         print(self.server_ip)
@@ -66,10 +67,17 @@ class server():
         try:
             #Press the key
             if code == "P":
-                self.keyboardcontroller.press(str(data[0]))
+                if data in self.specialkey_dic.keys():
+                    print("datum :", str(data[0]))
+                    self.keyboardcontroller.press(self.specialkey_dic[str(data[0])])
+                else:
+                    self.keyboardcontroller.press(str(data[0]))
             #Release it
             elif code == "R":
-                self.keyboardcontroller.release(str(data[0]))
+                if data in self.specialkey_dic.keys():
+                    self.keyboardcontroller.release(self.specialkey_dic[str(data[0])])
+                else:
+                    self.keyboardcontroller.release(str(data[0]))
         except Exception as e :
             print(e)
 

@@ -23,7 +23,7 @@ class Client():
 
         self.client_ip = socket.gethostbyname(socket.gethostname())
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.addr = ("127.0.1.1",self.port)
+        self.addr = ("127.0.0.1",self.port)
         self.preferences = open("Preferences.txt")
         self.translation_table = IM.extract_Translation_Table(self.preferences.read())
         print(self.translation_table)
@@ -38,6 +38,9 @@ class Client():
         self.client.send(message)
         #print(self.client.recv(2048))
 
+    def correct_data(self,data):
+        return data.replace("'","")
+
     def allower_checker(self,key):
         #Function used to swap state of the Allower
         global key_state
@@ -48,13 +51,10 @@ class Client():
     def on_press_key(self,key):
         ### Will send a message only if the Allower state is true
         self.key_state = self.allower_checker(key)
-        print(self.translation_table[str(key)])
         if self.key_state or self.locked_key_state:
             try:
-                if key in self.translation_table:
-                    self.send(str("{0} {1} {2} {3} {4}".format("K","P",self.translation_table[key],None,None)))
-                else:
-                    self.send(str("{0} {1} {2} {3} {4}".format("K","P",key,None,None)))
+                print(key)
+                self.send(str("{0} {1} {2} {3} {4}".format("K","P",key,None,None)))
             except AttributeError:
                 print('special key {0} pressed'.format(key))
 
@@ -66,8 +66,8 @@ class Client():
                     self.send(str("{0} {1} {2} {3} {4}".format("K","R",self.translation_table[key],None,None)))
                 else:
                     self.send(str("{0} {1} {2} {3} {4}".format("K","R",key,None,None)))
-                
-                
+
+
                 if key == keyboard.Key.esc:
                     #send("!!disconnect")
                     #return False
@@ -94,9 +94,9 @@ class Client():
 
     def on_activate_lock(self):
         print('<ctrl>+<alt>+<space> pressed')
-    
+
     def on_activate(self):
-   
+
         global locked_key_state
         self.locked_key_state = not self.locked_key_state
 
@@ -117,9 +117,6 @@ class Client():
             self.listenerkeyboard = keyboard.Listener(on_press=self.on_press_key,on_release=self.on_release_key)
             self.listenermouse = mouse.Listener(on_move=self.on_move_mouse,on_click=self.on_click_mouse,on_scroll=self.on_scroll_mouse)
 
-
-
-
             self.listenerkeyboard.start()
             self.listenermouse.start()
 
@@ -133,3 +130,4 @@ class Client():
         self.client.shutdown(socket.SHUT_RDWR)
         self.client.close()
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        sys.exit()
