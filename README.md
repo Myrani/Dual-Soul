@@ -1,2 +1,2 @@
 # Dual-Soul
-A fun little experience to play on two mouses and keyboards in one !   
+A fun little experient to play with two mouses and keyboards input with only one by sending inputs on a distant computer in the LAN.  
